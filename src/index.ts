@@ -16,7 +16,7 @@ export const Config: Schema<Config> = Schema.object({
 export async function apply(ctx: Context, config: Config) {
     ctx.command("历史上的今天", "获取今天在历史上发生的事件").action(async ({ session }) => {
         if (!session) {
-            return;
+            throw new Error("无法获取会话信息");
         }
 
         try {
