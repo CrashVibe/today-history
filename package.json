@@ -19,5 +19,8 @@
   },
   "devDependencies": {
     "koishi-plugin-html-renderer": "workspace:^"
+  },
+  "dependencies": {
+    "moment-timezone": "^0.6.0"
   }
 }

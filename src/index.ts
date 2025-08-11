@@ -1,15 +1,18 @@
 import { Context, h, Schema } from "koishi";
 import {} from "koishi-plugin-html-renderer/src";
 import path from "path";
+import moment from "moment-timezone";
 
 export const name = "today-history";
 export const inject = ["html_renderer"];
 
 export interface Config {
+    timezone: string;
     cacheTime: number;
 }
 
 export const Config: Schema<Config> = Schema.object({
+    timezone: Schema.string().default("Asia/Shanghai").description("设置时区，默认为 Asia/Shanghai (上海)"),
     cacheTime: Schema.number().default(3600).description("缓存时间（秒）")
 });
 
@@ -25,7 +28,8 @@ export async function apply(ctx: Context, config: Config) {
                 return "今天没有历史事件记录。";
             }
             const templateDir = path.resolve(__dirname, "templates");
-            const hour = new Date().getHours();
+            const now = moment.tz(config.timezone);
+            const hour = now.hour();
             const templateFile = hour >= 18 || hour < 6 ? "index_dark.ejs" : "index.ejs";
             const img = await ctx.html_renderer.render_template_html_file(
                 templateDir,
@@ -75,9 +79,9 @@ async function getTodayHistory(config: Config): Promise<TodayHistoryEvent[] | nu
         return cache.data;
     }
 
-    const today = new Date();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
+    const today = moment.tz(config.timezone);
+    const month = today.format("MM");
+    const day = today.format("DD");
     const dateKey = month + day;
 
     const fetchResponse = await fetch(`https://baike.baidu.com/cms/home/eventsOnHistory/${month}.json`);
