@@ -1,7 +1,7 @@
 import { Context, h, Schema } from "koishi";
 import {} from "koishi-plugin-html-renderer/src";
-import path from "path";
 import moment from "moment-timezone";
+import path from "path";
 
 export const name = "today-history";
 export const inject = ["html_renderer"];
@@ -30,14 +30,15 @@ export async function apply(ctx: Context, config: Config) {
             const templateDir = path.resolve(__dirname, "templates");
             const now = moment.tz(config.timezone);
             const hour = now.hour();
-            const templateFile = hour >= 18 || hour < 6 ? "index_dark.ejs" : "index.ejs";
+            const theme = hour >= 18 || hour < 6 ? "dark" : "light";
+            const currentDate = now.format("YYYY年MM月DD日");
             const img = await ctx.html_renderer.render_template_html_file(
                 templateDir,
-                templateFile,
-                { data },
+                "base.ejs",
+                { data, theme, currentDate },
                 {
                     viewport: {
-                        width: 800,
+                        width: 2000,
                         height: 1200
                     },
                     base_url: "file://" + templateDir
